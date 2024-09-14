@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Anime Website</title>
+    <link rel="stylesheet" href="styles.css">
+    <link rel="manifest" href="manifest.json">
+</head>
+<body>
+    <header>
+        <nav>
+            <ul>
+                <li><a href="#home" class="active">Home</a></li>
+                <li><a href="#ongoing">Ongoing</a></li>
+                <li><a href="#complete">Complete</a></li>
+                <li><a href="#livestreaming">Livestreaming</a></li>
+            </ul>
+        </nav>
+    </header>
+    <main>
+        <section id="home">
+            <h1>Home</h1>
+            <ul id="home-list"></ul>
+        </section>
+        <section id="ongoing">
+            <h1>Ongoing</h1>
+            <ul id="ongoing-list"></ul>
+        </section>
+        <section id="complete">
+            <h1>Complete</h1>
+            <ul id="complete-list"></ul>
+        </section>
+        <section id="livestreaming">
+            <h1>Livestreaming</h1>
+            <ul id="livestreaming-list"></ul>
+        </section>
+    </main>
+    <script src="script.js"></script>
+    <script>
+        // Add to home screen prompt
+        let deferredPrompt;
+        window.addEventListener('beforeinstallprompt', (e) => {
+            deferredPrompt = e;
+            document.getElementById('install-button').style.display = 'block';
+        });
+
+        document.getElementById('install-button').addEventListener('click', (e) => {
+            deferredPrompt.prompt();
+            deferredPrompt.userChoice.then((choiceResult) => {
+                if (choiceResult.outcome === 'accepted') {
+                    console.log('User accepted the A2HS prompt');
+                } else {
+                    console.log('User dismissed the A2HS prompt');
+                }
+                deferredPrompt = null;
+            });
+        });
+    </script>
+    <button id="install-button" style="display: none;">Install</button>
+</body>
+</html>
