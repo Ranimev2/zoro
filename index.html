@@ -5,7 +5,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Shanaanime</title>
-    <link rel="stylesheet" href="styles.css">
+    <link rel="stylesheet" href="css/styles.css">
 </head>
 <body>
     <header>
@@ -20,6 +20,14 @@
         </nav>
     </header>
     <main>
+        <section id="search">
+            <h2>Search Anime</h2>
+            <form id="search-form">
+                <input type="text" id="search-input" placeholder="Masukkan judul anime">
+                <button type="submit">Cari</button>
+            </form>
+            <div id="search-list"></div>
+        </section>
         <section id="ongoing">
             <h2>Ongoing Anime</h2>
             <div id="ongoing-list"></div>
@@ -36,19 +44,11 @@
             <h2>Episode List</h2>
             <div id="episode-list"></div>
         </section>
-        <section id="search">
-            <h2>Search Anime</h2>
-            <form id="search-form">
-                <input type="text" id="search-input" placeholder="Masukkan judul anime">
-                <button type="submit">Cari</button>
-            </form>
-            <div id="search-list"></div>
-        </section>
         <section id="genres">
             <h2>Genres</h2>
             <div id="genres-list"></div>
         </section>
     </main>
-    <script src="script.js"></script>
+    <script src="js/script.js"></script>
 </body>
 </html>
