@@ -1,76 +1,157 @@
-// Function to scrape anime data from zoronime.com
-async function scrapeAnimeData(url) {
-    const response = await fetch(url);
-    const html = await response.text();
-    const parser = new DOMParser();
-    const doc = parser.parseFromString(html, 'text/html');
-    const animeList = doc.querySelectorAll('.anime');
-    const animeData = [];
-    animeList.forEach(anime => {
-        const title = anime.querySelector('h2.title').textContent;
-        const url = anime.querySelector('a').getAttribute('href');
-        animeData.push({ title, url });
-    });
-    return animeData;
+// script.js
+const apiUrl = 'https://ranimev2-api.vercel.app/kuramanime/';
+
+// Fungsi untuk mengambil data anime
+function getAnimeData(endpoint) {
+    fetch(`${apiUrl}/anime/${endpoint}`)
+        .then(response => response.json())
+        .then(data => {
+            const animeList = document.getElementById('anime-list');
+            animeList.innerHTML = ''; // Hapus isi sebelumnya
+            data.forEach(anime => {
+                const animeElement = document.createElement('div');
+                animeElement.textContent = anime.title;
+                animeElement.onclick = () => {
+                    getEpisodeData(anime.title);
+                };
+                animeList.appendChild(animeElement);
+            });
+        });
 }
 
-// Function to scrape episode data from zoronime.com
-async function scrapeEpisodeData(url) {
-    const response = await fetch(url);
-    const html = await response.text();
-    const parser = new DOMParser();
-    const doc = parser.parseFromString(html, 'text/html');
-    const episodeList = doc.querySelectorAll('.episode');
-    const episodeData = [];
-    episodeList.forEach(episode => {
-        const title = episode.querySelector('h2.title').textContent;
-        const url = episode.querySelector('a').getAttribute('href');
-        episodeData.push({ title, url });
-    });
-    return episodeData;
+// Fungsi untuk mengambil data episode
+function getEpisodeData(anime, eps) {
+    fetch(`${apiUrl}/anime/${anime}/${eps}`)
+        .then(response => response.json())
+        .then(data => {
+            const episodeList = document.getElementById('episode-list');
+            episodeList.innerHTML = ''; // Hapus isi sebelumnya
+            data.forEach(episode => {
+                const episodeElement = document.createElement('div');
+                episodeElement.textContent = `Episode ${episode.episode} - ${episode.title}`;
+                episodeList.appendChild(episodeElement);
+            });
+        });
 }
 
-// Function to scrape ended anime data from zoronime.com
-async function scrapeEndedAnimeData(url) {
-    const response = await fetch(url);
-    const html = await response.text();
-    const parser = new DOMParser();
-    const doc = parser.parseFromString(html, 'text/html');
-    const endedAnimeList = doc.querySelectorAll('.anime');
-    const endedAnimeData = [];
-    endedAnimeList.forEach(anime => {
-        const title = anime.querySelector('h2.title').textContent;
-        endedAnimeData.push({ title });
-    });
-    return endedAnimeData;
+// Fungsi untuk mengambil data ongoing dan finished
+function getOngoingData(page) {
+    fetch(`${apiUrl}/ongoing/popular?page=${page}`)
+        .then(response => response.json())
+        .then(data => {
+            const ongoingList = document.getElementById('ongoing-list');
+            data.forEach(anime => {
+                const animeElement = document.createElement('div');
+                animeElement.textContent = anime.title;
+                ongoingList.appendChild(animeElement);
+            });
+        });
 }
 
-// Function to display anime data
-function displayAnimeData(animeData, element) {
-    const list = document.getElementById(element);
-    animeData.forEach(anime => {
-        const listItem = document.createElement('li');
-        const link = document.createElement('a');
-        link.href = anime.url;
-        link.textContent = anime.title;
-        listItem.appendChild(link);
-        list.appendChild(listItem);
-    });
+function getFinishedData(page) {
+    fetch(`${apiUrl}/finished/popular?page=${page}`)
+        .then(response => response.json())
+        .then(data => {
+            const finishedList = document.getElementById('finished-list');
+            data.forEach(anime => {
+                const animeElement = document.createElement('div');
+                animeElement.textContent = anime.title;
+                finishedList.appendChild(animeElement);
+            });
+        });
 }
 
-// Scrape data from multiple sources
-async function scrapeData() {
-    const homeData = await scrapeAnimeData('https://zoronime.com/home/');
-    const ongoingData = await scrapeAnimeData('https://zoronime.com/anime/');
-    const completeData = await scrapeEndedAnimeData('https://zoronime.com/tag/ended/');
-    const livestreamingData = await scrapeEpisodeData('https://zoronime.com/episode/');
-
-    // Display data
-    displayAnimeData(homeData, 'home-list');
-    displayAnimeData(ongoingData, 'ongoing-list');
-    displayAnimeData(completeData, 'complete-list');
-    displayAnimeData(livestreamingData, 'livestreaming-list');
+// Fungsi untuk mengambil data pencarian
+function searchAnime(keyword, page) {
+    fetch(`${apiUrl}/search?query=${keyword}&page=${page}`)
+        .then(response => response.json())
+        .then(data => {
+            const searchList = document.getElementById('search-list');
+            searchList.innerHTML = ''; // Hapus isi sebelumnya
+            data.forEach(anime => {
+                const animeElement = document.createElement('div');
+                animeElement.textContent = anime.title;
+                animeElement.onclick = () => {
+                    getEpisodeData(anime.title);
+                };
+                searchList.appendChild(animeElement);
+            });
+        });
 }
 
-// Call the scrapeData function
-scrapeData();
+// Fungsi untuk mengambil data genres
+function getGenres() {
+    fetch(`${apiUrl}/genres`)
+        .then(response => response.json())
+        .then(data => {
+            const genresList = document.getElementById('genres-list');
+            genresList.innerHTML = ''; // Hapus isi sebelumnya
+            data.forEach(genre => {
+                const genreElement = document.createElement('div');
+                genreElement.textContent = genre.name;
+                genreElement.onclick = () => {
+                    getAnimeByGenre(genre.name);
+                };
+                genresList.appendChild(genreElement);
+            });
+        });
+}
+
+// Fungsi untuk mengambil data anime berdasarkan genre
+function getAnimeByGenre(endpoint,page) {
+    fetch(`${apiUrl}/anime/genres/${endpoint}?page=${page}`)
+        .then(response => response.json())
+        .then(data => {
+            const animeList = document.getElementById('anime-list');
+            animeList.innerHTML = ''; // Hapus isi sebelumnya
+            data.forEach(anime => {
+                const animeElement = document.createElement('div');
+                animeElement.textContent = anime.title;
+                animeElement.onclick = () => {
+                    getEpisodeData(anime.title);
+                };
+                animeList.appendChild(animeElement);
+            });
+        });
+}
+
+// Fungsi untuk mengambil data semua genres
+function getAllGenres(endpoint, page) {
+    fetch(`${apiUrl}/genres/${endpoint}?page=${page}`)
+        .then(response => response.json())
+        .then(data => {
+            const genresList = document.getElementById('genres-list');
+            genresList.innerHTML = ''; // Hapus isi sebelumnya
+            data.forEach(genre => {
+                const genreElement = document.createElement('div');
+                genreElement.textContent = genre.name;
+                genreElement.onclick = () => {
+                    getAnimeByGenre(genre.name);
+                };
+                genresList.appendChild(genreElement);
+            });
+        });
+}
+
+// Panggil fungsi-fungsi di atas
+getOngoingData();
+getFinishedData();
+getAnimeData(''); // Ganti dengan endpoint yang diinginkan
+getGenres();
+getAllGenres('all', 1); // Get all genres
+
+// Tambahkan event listener untuk mengambil data episode ketika anime diklik
+document.getElementById('anime-list').addEventListener('click', (e) => {
+    if (e.target.tagName === 'DIV') {
+        const animeTitle = e.target.textContent;
+        getEpisodeData(animeTitle);
+    }
+});
+
+// Tambahkan event listener untuk pencarian
+document.getElementById('search-form').addEventListener('submit', (e) => {
+    e.preventDefault();
+    const query = document.getElementById('search-input').value;
+    const page = 1;
+    searchAnime(query, page);
+});
