@@ -1,13 +1,9 @@
-// script.js
-const apiUrl = 'https://ranimev2-api.vercel.app/kuramanime/';
-
-// Fungsi untuk mengambil data anime
 function getAnimeData(endpoint) {
     fetch(`${apiUrl}/anime/${endpoint}`)
         .then(response => response.json())
         .then(data => {
             const animeList = document.getElementById('anime-list');
-            animeList.innerHTML = ''; // Hapus isi sebelumnya
+            animeList.innerHTML = '';
             data.forEach(anime => {
                 const animeElement = document.createElement('div');
                 animeElement.textContent = anime.title;
@@ -19,7 +15,7 @@ function getAnimeData(endpoint) {
         });
 }
 
-// Fungsi untuk mengambil data episode
+// Fungsi untuk meng
 function getEpisodeData(anime, eps) {
     fetch(`${apiUrl}/anime/${anime}/${eps}`)
         .then(response => response.json())
