@@ -1,9 +1,6 @@
-// script.js
 require('dotenv').config();
-
 const apiUrl = process.env.API_URL;
-
-// ... rest of the code ...
+const apiUrl = import.meta.env.API_URL;
 
 function getAnimeData(endpoint) {
     fetch(`${apiUrl}/anime/${endpoint}`)
