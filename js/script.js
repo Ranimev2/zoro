@@ -1,3 +1,10 @@
+// script.js
+require('dotenv').config();
+
+const apiUrl = process.env.API_URL;
+
+// ... rest of the code ...
+
 function getAnimeData(endpoint) {
     fetch(`${apiUrl}/anime/${endpoint}`)
         .then(response => response.json())
