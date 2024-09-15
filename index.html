@@ -1,54 +1,46 @@
-<!-- index.html -->
 <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Shanaanime</title>
-    <link rel="stylesheet" href="css/styles.css">
+    <title>Anime Details and Popular Anime</title>
+    <link rel="stylesheet" href="styles.css">
 </head>
 <body>
-    <header>
-        <nav>
-            <ul>
-                <li><a href="#ongoing">Ongoing</a></li>
-                <li><a href="#finished">Finished</a></li>
-                <li><a href="#anime">Anime List</a></li>
-                <li><a href="#search">Search</a></li>
-                <li><a href="#genres">Genres</a></li>
-            </ul>
-        </nav>
-    </header>
-    <main>
-        <section id="search">
-            <h2>Search Anime</h2>
-            <form id="search-form">
-                <input type="text" id="search-input" placeholder="Masukkan judul anime">
-                <button type="submit">Cari</button>
-            </form>
-            <div id="search-list"></div>
-        </section>
-        <section id="ongoing">
-            <h2>Ongoing Anime</h2>
-            <div id="ongoing-list"></div>
-        </section>
-        <section id="finished">
-            <h2>Finished Anime</h2>
-            <div id="finished-list"></div>
-        </section>
-        <section id="anime">
-            <h2>Anime List</h2>
-            <div id="anime-list"></div>
-        </section>
-        <section id="episode">
-            <h2>Episode List</h2>
-            <div id="episode-list"></div>
-        </section>
-        <section id="genres">
-            <h2>Genres</h2>
-            <div id="genres-list"></div>
-        </section>
-    </main>
-    <script src="js/script.js"></script>
+    <div class="container">
+        <header>
+            <h1>Anime Search</h1>
+            <div class="search-container">
+                <input type="text" id="animeInput" placeholder="Enter anime name">
+                <button id="searchButton">Search</button>
+            </div>
+        </header>
+        <main>
+            <section id="animeDetails">
+                <img id="animeImage" src="" alt="Anime Image">
+                <div class="details-container">
+                    <h2 id="animeTitle"></h2>
+                    <p id="animeDescription"></p>
+                </div>
+            </section>
+            <section id="popularOngoing">
+                <h2>Popular Ongoing Anime</h2>
+                <div id="popularOngoingList" class="anime-list"></div>
+                <div class="pagination">
+                    <button id="prevOngoingPageButton">Previous Page</button>
+                    <button id="nextOngoingPageButton">Next Page</button>
+                </div>
+            </section>
+            <section id="popularFinished">
+                <h2>Popular Finished Anime</h2>
+                <div id="popularFinishedList" class="anime-list"></div>
+                <div class="pagination">
+                    <button id="prevFinishedPageButton">Previous Page</button>
+                    <button id="nextFinishedPageButton">Next Page</button>
+                </div>
+            </section>
+        </main>
+    </div>
+    <script src="js/scripts.js"></script>
 </body>
 </html>
