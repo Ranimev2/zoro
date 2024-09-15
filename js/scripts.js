@@ -1,7 +1,9 @@
 document.getElementById('searchButton').addEventListener('click', function() {
     const animeName = document.getElementById('animeInput').value.trim();
+    const episodeNumber = document.getElementById('episodeInput') ? document.getElementById('episodeInput').value.trim() : null;
+    
     if (animeName) {
-        fetchAnimeDetails(animeName);
+        fetchAnimeDetails(animeName, episodeNumber || 1); // Default ke episode 1 jika tidak ada input
     } else {
         alert('Please enter an anime name');
     }
@@ -30,63 +32,63 @@ document.getElementById('nextFinishedPageButton').addEventListener('click', func
 let currentOngoingPage = 1;
 let currentFinishedPage = 1;
 
-function fetchAnimeDetails(anime, eps) {
+async function fetchAnimeDetails(anime, eps) {
     const apiUrl = `https://ranimev2-api.vercel.app/kuramanime/anime/${anime}/${eps}`;
-    fetch(apiUrl)
-        .then(response => response.json())
-        .then(data => {
-            if (data && data.anime) {
-                displayAnimeDetails(data.anime);
-            } else {
-                alert('Anime not found');
-            }
-        })
-        .catch(error => {
-            console.error('Error fetching anime details:', error);
-            alert('Error fetching anime details');
-        });
+    try {
+        const response = await fetch(apiUrl);
+        if (!response.ok) throw new Error(`Error fetching anime details. Status: ${response.status}`);
+        
+        const data = await response.json();
+        if (data && data.anime) {
+            displayAnimeDetails(data.anime);
+        } else {
+            alert('Anime or episode not found');
+        }
+    } catch (error) {
+        handleError(error, 'Error fetching anime details');
+    }
+}
+
+async function fetchPopularOngoingAnime(page) {
+    const apiUrl = `https://ranimev2-api.vercel.app/kuramanime/ongoing/popular?page=${page}`;
+    try {
+        const response = await fetch(apiUrl);
+        if (!response.ok) throw new Error(`Error fetching popular ongoing anime. Status: ${response.status}`);
+        
+        const data = await response.json();
+        if (data && data.animeList) {
+            currentOngoingPage = page;
+            displayPopularAnime(data.animeList, 'popularOngoingList');
+        } else {
+            alert('Failed to fetch popular ongoing anime');
+        }
+    } catch (error) {
+        handleError(error, 'Error fetching popular ongoing anime');
+    }
+}
+
+async function fetchPopularFinishedAnime(page) {
+    const apiUrl = `https://ranimev2-api.vercel.app/kuramanime/finished/popular?page=${page}`;
+    try {
+        const response = await fetch(apiUrl);
+        if (!response.ok) throw new Error(`Error fetching popular finished anime. Status: ${response.status}`);
+        
+        const data = await response.json();
+        if (data && data.animeList) {
+            currentFinishedPage = page;
+            displayPopularAnime(data.animeList, 'popularFinishedList');
+        } else {
+            alert('Failed to fetch popular finished anime');
+        }
+    } catch (error) {
+        handleError(error, 'Error fetching popular finished anime');
+    }
 }
 
 function displayAnimeDetails(anime) {
     document.getElementById('animeImage').src = anime.image_url || '';
     document.getElementById('animeTitle').innerText = anime.title || 'No title available';
     document.getElementById('animeDescription').innerText = anime.description || 'No description available';
-}
-
-function fetchPopularOngoingAnime(page) {
-    const apiUrl = `https://ranimev2-api.vercel.app/kuramanime/ongoing/popular?page=${page}`;
-    fetch(apiUrl)
-        .then(response => response.json())
-        .then(data => {
-            if (data && data.animeList) {
-                currentOngoingPage = page;
-                displayPopularAnime(data.animeList, 'popularOngoingList');
-            } else {
-                alert('Failed to fetch popular ongoing anime');
-            }
-        })
-        .catch(error => {
-            console.error('Error fetching popular ongoing anime:', error);
-            alert('Error fetching popular ongoing anime');
-        });
-}
-
-function fetchPopularFinishedAnime(page) {
-    const apiUrl = `https://ranimev2-api.vercel.app/kuramanime/finished/popular?page=${page}`;
-    fetch(apiUrl)
-        .then(response => response.json())
-        .then(data => {
-            if (data && data.animeList) {
-                currentFinishedPage = page;
-                displayPopularAnime(data.animeList, 'popularFinishedList');
-            } else {
-                alert('Failed to fetch popular finished anime');
-            }
-        })
-        .catch(error => {
-            console.error('Error fetching popular finished anime:', error);
-            alert('Error fetching popular finished anime');
-        });
 }
 
 function displayPopularAnime(animeList, elementId) {
@@ -101,6 +103,11 @@ function displayPopularAnime(animeList, elementId) {
         `;
         popularAnimeList.appendChild(animeItem);
     });
+}
+
+function handleError(error, message) {
+    console.error(message, error);
+    alert(message);
 }
 
 // Initial load of popular ongoing anime
