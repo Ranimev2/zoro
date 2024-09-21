@@ -32,8 +32,8 @@ document.getElementById('nextFinishedPageButton').addEventListener('click', func
 let currentOngoingPage = 1;
 let currentFinishedPage = 1;
 
-async function fetchAnimeDetails(anime, eps) {
-    const apiUrl = `https://ranimev2-api.vercel.app/kuramanime/anime/${anime}/${eps}`;
+async function fetchAnimeDetails(slug) {
+    const apiUrl = `https://kumanime-api-weld.vercel.app/api/anime/${slug}`;
     try {
         const response = await fetch(apiUrl);
         if (!response.ok) throw new Error(`Error fetching anime details. Status: ${response.status}`);
@@ -49,6 +49,24 @@ async function fetchAnimeDetails(anime, eps) {
     }
 }
 
+async function fetchAnimeDetails(slug) {
+    const apiUrl = `https://kumanime-api-weld.vercel.app/api/episode/${slug}`;
+    try {
+        const response = await fetch(apiUrl);
+        if (!response.ok) throw new Error(`Error fetching anime details. Status: ${response.status}`);
+        
+        const data = await response.json();
+        if (data && data.anime) {
+            displayAnimeDetails(data.anime);
+        } else {
+            alert('Anime or episode not found');
+        }
+    } catch (error) {
+        handleError(error, 'Error fetching anime details');
+    }
+}
+
+
 async function fetchPopularOngoingAnime(page) {
     const apiUrl = `https://ranimev2-api.vercel.app/kuramanime/ongoing/popular?page=${page}`;
     try {
@@ -57,7 +75,7 @@ async function fetchPopularOngoingAnime(page) {
         
         const data = await response.json();
         if (data && data.animeList) {
-            currentOngoingPage = page;
+            currentOngoingPage ;
             displayPopularAnime(data.animeList, 'popularOngoingList');
         } else {
             alert('Failed to fetch popular ongoing anime');
