@@ -1,135 +1,98 @@
-document.getElementById('searchButton').addEventListener('click', function() {
-    const animeName = document.getElementById('animeInput').value.trim();
-    const episodeNumber = document.getElementById('episodeInput') ? document.getElementById('episodeInput').value.trim() : null;
-    
-    if (animeName) {
-        fetchAnimeDetails(animeName, episodeNumber || 1); // Default ke episode 1 jika tidak ada input
-    } else {
-        alert('Please enter an anime name');
+// Get the API endpoints
+const popularApi = 'https://kumanime-api-weld.vercel.app/api/popular';
+const latestApi = 'https://kumanime-api-weld.vercel.app/api/latest';
+const animeApi = 'https://kumanime-api-weld.vercel.app/api/anime/';
+const episodeApi = 'https://kumanime-api-weld.vercel.app/api/episode/';
+
+// Get the main element
+const main = document.querySelector('main');
+
+// Function to fetch API data
+async function fetchData(url) {
+  try {
+    const response = await fetch(url);
+    const data = await response.json();
+    return data;
+  } catch (error) {
+    console.error(error);
+  }
+}
+
+// Function to render anime list
+function renderAnimeList(data) {
+  const animeList = data.data;
+  const html = '';
+  animeList.forEach((anime) => {
+    html += `
+      <div>
+        <h2>${anime.title}</h2>
+        <p>${anime.description}</p>
+        <a href="/anime/${anime.slug}">Read more</a>
+      </div>
+    `;
+  });
+  main.innerHTML = html;
+}
+
+// Function to render latest episodes
+function renderLatestEpisodes(data) {
+  const episodes = data.data;
+  const html = '';
+  episodes.forEach((episode) => {
+    html += `
+      <div>
+        <h2>${episode.title}</h2>
+        <p>${episode.description}</p>
+        <a href="/episode/${episode.slug}">Watch now</a>
+      </div>
+    `;
+  });
+  main.innerHTML = html;
+}
+
+// Function to render anime details
+function renderAnimeDetails(data) {
+  const anime = data.data;
+  const html = `
+    <h1>${anime.title}</h1>
+    <p>${anime.description}</p>
+    <h2>Episodes:</h2>
+    <ul>
+      ${anime.episodes.map((episode) => `<li><a href="/episode/${episode.slug}">${episode.title}</a></li>`).join('')}
+    </ul>
+  `;
+  main.innerHTML = html;
+}
+
+// Function to render episode details
+function renderEpisodeDetails(data) {
+  const episode = data.data;
+  const html = `
+    <h1>${episode.title}</h1>
+    <p>${episode.description}</p>
+    <video src="${episode.videoUrl}" controls></video>
+  `;
+  main.innerHTML = html;
+}
+
+// Add event listeners to navigation links
+document.querySelectorAll('nav a').forEach((link) => {
+  link.addEventListener('click', (event) => {
+    event.preventDefault();
+    const url = link.href;
+    if (url === '/') {
+      fetchData(popularApi).then((data) => renderAnimeList(data));
+    } else if (url === '/latest') {
+      fetchData(latestApi).then((data) => renderLatestEpisodes(data));
+    } else if (url.includes('/anime/')) {
+      const slug = url.split('/anime/')[1];
+      fetchData(animeApi + slug).then((data) => renderAnimeDetails(data));
+    } else if (url.includes('/episode/')) {
+      const slug = url.split('/episode/')[1];
+      fetchData(episodeApi + slug).then((data) => renderEpisodeDetails(data));
     }
+  });
 });
 
-document.getElementById('prevOngoingPageButton').addEventListener('click', function() {
-    if (currentOngoingPage > 1) {
-        fetchPopularOngoingAnime(currentOngoingPage - 1);
-    }
-});
-
-document.getElementById('nextOngoingPageButton').addEventListener('click', function() {
-    fetchPopularOngoingAnime(currentOngoingPage + 1);
-});
-
-document.getElementById('prevFinishedPageButton').addEventListener('click', function() {
-    if (currentFinishedPage > 1) {
-        fetchPopularFinishedAnime(currentFinishedPage - 1);
-    }
-});
-
-document.getElementById('nextFinishedPageButton').addEventListener('click', function() {
-    fetchPopularFinishedAnime(currentFinishedPage + 1);
-});
-
-let currentOngoingPage = 1;
-let currentFinishedPage = 1;
-
-async function fetchAnimeDetails(slug) {
-    const apiUrl = `https://kumanime-api-weld.vercel.app/api/anime/${slug}`;
-    try {
-        const response = await fetch(apiUrl);
-        if (!response.ok) throw new Error(`Error fetching anime details. Status: ${response.status}`);
-        
-        const data = await response.json();
-        if (data && data.anime) {
-            displayAnimeDetails(data.anime);
-        } else {
-            alert('Anime or episode not found');
-        }
-    } catch (error) {
-        handleError(error, 'Error fetching anime details');
-    }
-}
-
-async function fetchAnimeDetails(slug) {
-    const apiUrl = `https://kumanime-api-weld.vercel.app/api/episode/${slug}`;
-    try {
-        const response = await fetch(apiUrl);
-        if (!response.ok) throw new Error(`Error fetching anime details. Status: ${response.status}`);
-        
-        const data = await response.json();
-        if (data && data.anime) {
-            displayAnimeDetails(data.anime);
-        } else {
-            alert('Anime or episode not found');
-        }
-    } catch (error) {
-        handleError(error, 'Error fetching anime details');
-    }
-}
-
-
-async function fetchPopularOngoingAnime(page) {
-    const apiUrl = `https://ranimev2-api.vercel.app/kuramanime/ongoing/popular?page=${page}`;
-    try {
-        const response = await fetch(apiUrl);
-        if (!response.ok) throw new Error(`Error fetching popular ongoing anime. Status: ${response.status}`);
-        
-        const data = await response.json();
-        if (data && data.animeList) {
-            currentOngoingPage ;
-            displayPopularAnime(data.animeList, 'popularOngoingList');
-        } else {
-            alert('Failed to fetch popular ongoing anime');
-        }
-    } catch (error) {
-        handleError(error, 'Error fetching popular ongoing anime');
-    }
-}
-
-async function fetchPopularFinishedAnime(page) {
-    const apiUrl = `https://kumanime-api-weld.vercel.app/api/movie/page/${page}`;
-    try {
-        const response = await fetch(apiUrl);
-        if (!response.ok) throw new Error(`Error fetching popular finished anime. Status: ${response.status}`);
-        
-        const data = await response.json();
-        if (data && data.animeList) {
-            currentFinishedPage = page;
-            displayPopularAnime(data.animeList, 'popularFinishedList');
-        } else {
-            alert('Failed to fetch movie anime');
-        }
-    } catch (error) {
-        handleError(error, 'Error fetching movie anime');
-    }
-}
-
-function displayAnimeDetails(anime) {
-    document.getElementById('animeImage').src = anime.image_url || '';
-    document.getElementById('animeTitle').innerText = anime.title || 'No title available';
-    document.getElementById('animeDescription').innerText = anime.description || 'No description available';
-}
-
-function displayPopularAnime(animeList, elementId) {
-    const popularAnimeList = document.getElementById(elementId);
-    popularAnimeList.innerHTML = '';
-    animeList.forEach(anime => {
-        const animeItem = document.createElement('div');
-        animeItem.className = 'animeItem';
-        animeItem.innerHTML = `
-            <img src="${anime.image_url || ''}" alt="${anime.title || 'No title available'}">
-            <h3>${anime.title || 'No title available'}</h3>
-        `;
-        popularAnimeList.appendChild(animeItem);
-    });
-}
-
-function handleError(error, message) {
-    console.error(message, error);
-    alert(message);
-}
-
-// Initial load of popular ongoing anime
-fetchPopularOngoingAnime(currentOngoingPage);
-
-// Initial load of popular finished anime
-fetchPopularFinishedAnime(currentFinishedPage);
+// Initialize the website
+fetchData(popularApi).then((data) => renderAnimeList(data));
