@@ -68,7 +68,7 @@ async function fetchPopularOngoingAnime(page) {
 }
 
 async function fetchPopularFinishedAnime(page) {
-    const apiUrl = `https://ranimev2-api.vercel.app/kuramanime/finished/popular?page=${page}`;
+    const apiUrl = `https://kumanime-api-weld.vercel.app/api/movie/page/${page}`;
     try {
         const response = await fetch(apiUrl);
         if (!response.ok) throw new Error(`Error fetching popular finished anime. Status: ${response.status}`);
@@ -78,10 +78,10 @@ async function fetchPopularFinishedAnime(page) {
             currentFinishedPage = page;
             displayPopularAnime(data.animeList, 'popularFinishedList');
         } else {
-            alert('Failed to fetch popular finished anime');
+            alert('Failed to fetch movie anime');
         }
     } catch (error) {
-        handleError(error, 'Error fetching popular finished anime');
+        handleError(error, 'Error fetching movie anime');
     }
 }
 
